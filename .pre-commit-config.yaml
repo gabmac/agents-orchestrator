@@ -1,0 +1,131 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+repos:
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v5.0.0
+  hooks:
+  - id: check-ast
+  - id: trailing-whitespace
+  - id: check-toml
+  - id: check-case-conflict
+  - id: check-json
+  - id: check-yaml
+  - id: check-merge-conflict
+  - id: debug-statements
+  - id: check-added-large-files
+    args: [--maxkb=1000]
+  - id: end-of-file-fixer
+  - id: mixed-line-ending
+    args: [--fix=lf]
+
+- repo: https://github.com/compilerla/conventional-pre-commit
+  rev: v4.0.0
+  hooks:
+  - id: conventional-pre-commit
+    stages: [commit-msg]
+    args: [fixup!, build, chore, ci, docs, style, refactor, perf, test]
+
+- repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
+  rev: v2.15.0
+  hooks:
+  - id: pretty-format-yaml
+    args:
+    - --autofix
+    - --preserve-quotes
+    - --indent=2
+
+- repo: local
+  hooks:
+  - id: hyfmt
+    name: Format Hy files with hyfmt
+    entry: uv run hyfmt
+    language: system
+    types: [file]
+    types_or: [hy]
+
+  - id: ruff-format
+    name: Format Python files with Ruff
+    entry: uv run ruff format
+    language: system
+    types: [python]
+
+  - id: ruff-check
+    name: Lint with Ruff
+    entry: uv run ruff check --fix
+    language: system
+    types: [python]
+
+  - id: ruff-check-hy
+    name: Lint Hy files with Ruff
+    entry: uv run ruff check --fix
+    language: system
+    types: [file]
+    types_or: [hy]
+
+  - id: mypy
+    name: Type check with MyPy
+    entry: uv run mypy src/ tests/
+    language: system
+    types: [python]
+    pass_filenames: false
+
+  - id: import-linter
+    name: Enforce architecture import contracts
+    entry: uv run import-linter check
+    language: system
+    types: [python]
+    pass_filenames: false
+
+  - id: bandit
+    name: Security audit with Bandit
+    entry: uv run bandit -r src/
+    language: system
+    types: [python]
+    pass_filenames: false
+
+  - id: pip-audit
+    name: Dependency audit with pip-audit
+    entry: bash -c "uv export --no-hashes | uv run pip-audit --no-deps -r /dev/stdin"
+    language: system
+    types: [python]
+    pass_filenames: false
+
+- repo: https://github.com/semgrep/pre-commit
+  rev: v1.168.0
+  hooks:
+  - id: semgrep
+    name: Semgrep (project rules + security packs)
+    args:
+    - --config
+    - .semgrep/rules
+    - --config
+    - p/python
+    - --config
+    - p/security-audit
+    - --config
+    - p/secrets
+    - --config
+    - p/owasp-top-ten
+    - --config
+    - p/cwe-top-25
+    - --config
+    - p/command-injection
+    - --config
+    - p/insecure-transport
+    - --config
+    - p/docker
+    - --error
+    - --metrics=off
+    - --quiet
+    - --skip-unknown-extensions
+    - --disable-version-check
+    types_or: [python, hy, dockerfile]
+    exclude: ^(\.semgrep/)
+
+- repo: https://github.com/gitleaks/gitleaks
+  rev: v8.29.1
+  hooks:
+  - id: gitleaks
+    args:
+    - --verbose
+    - --redact

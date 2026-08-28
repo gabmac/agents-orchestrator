@@ -1,0 +1,232 @@
+[project]
+name = "finance-manager-hy"
+version = "0.1.0"
+description = "Finance manager built with HyLang (Lisp on Python VM)"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "hy>=1.0.0",
+    "pydantic>=2.0",
+    "pydantic-settings>=2.0",
+    "sqlmodel>=0.0.21",
+    "alembic>=1.13",
+    "asyncpg>=0.29",
+    "httpx>=0.27",
+    "python-dotenv>=1.0",
+    "click>=8.1",
+    "rich>=13.7",
+    "uuid6>=1.11",
+    "pendulum>=3.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.2",
+    "pytest-asyncio>=0.23",
+    "pytest-cov>=5.0",
+    "mypy>=1.11",
+    "ruff>=0.6",
+    "mutmut>=3.0",
+    "hypothesis>=6.100",
+    "factory-boy>=3.3",
+    "respx>=0.21",
+    "testcontainers>=4.8",
+    "moto>=4.2",
+    "bandit>=1.7",
+    "pip-audit>=2.7",
+    "pre-commit>=3.7",
+    "import-linter>=2.14",
+]
+db = [
+    "asyncpg>=0.29",
+    "psycopg2-binary>=2.9",
+]
+api = [
+    "fastapi>=0.111",
+    "uvicorn>=0.30",
+]
+
+[tool.uv]
+dev-dependencies = [
+    "pytest>=8.2",
+    "pytest-asyncio>=0.23",
+    "pytest-cov>=5.0",
+    "mypy>=1.11",
+    "ruff>=0.6",
+    "mutmut>=3.0",
+    "hypothesis>=6.100",
+    "factory-boy>=3.3",
+    "respx>=0.21",
+    "testcontainers>=4.8",
+    "moto>=4.2",
+    "bandit>=1.7",
+    "pip-audit>=2.7",
+    "pre-commit>=3.7",
+]
+
+[build-system]
+requires = ["hatchling>=1.0.0"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/finance_manager_hy"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+indent-style = "space"
+indent-width = 2
+preview = true
+
+[tool.ruff.format]
+quote-style = "single"
+indent-style = "space"
+indent-width = 2
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "T20", # flake8-print
+    "PIE", # flake8-pie
+    "PT",  # flake8-pytest-style
+    "Q",   # flake8-quotes
+    "RUF", # ruff-specific
+    "TRY", # tryceratops
+    "DTZ", # datetime
+    "EM",  # flake8-errmsg
+    "EXE", # flake8-executable
+    "ISC", # flake8-implicit-str-concat
+    "ICN", # flake8-import-conventions
+    "G",   # flake8-logging-format
+    "PL",  # pylint
+    "RET", # flake8-return
+]
+ignore = [
+    "E501",  # line too long (handled by formatter)
+    "B008",  # do not perform function calls in argument defaults
+    "C901",  # too complex (hy macros can be complex)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101", "SLF001"]
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+no_implicit_optional = true
+strict_optional = true
+implicit_reexport = false
+allow_untyped_globals = false
+enable_error_code = ["ignore-without-action"]
+namespace_packages = true
+explicit_package_bases = true
+
+[[tool.mypy.overrides]]
+module = "hy.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+ignore_missing_imports = true
+disallow_untyped_defs = false
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+python_files = ["test_*.hy", "test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --strict-markers --strict-config"
+
+[tool.coverage.run]
+source = ["src"]
+omit = ["tests/*", "*/conftest.py"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]
+
+[tool.mutmut]
+paths_to_mutate = "src/"
+backup = false
+runner = "uv run python -m pytest tests/ -x --tb=short"
+tests_dir = "tests/"
+
+[tool.hyfmt]
+indent = 2
+
+[tool.bandit]
+exclude_dirs = ["tests", ".venv", "dist", "build"]
+skips = ["B101", "B601"]
+
+[tool.pip-audit]
+descend = true
+dry-run = false
+
+[tool.importlinter]
+[tool.importlinter.contracts.hexagonal-architecture]
+name = "Hexagonal Architecture"
+type = "layers"
+layers = [
+    "finance_manager_hy.entities",
+    "finance_manager_hy.logic",
+    "finance_manager_hy.wire",
+    "finance_manager_hy.adapters",
+    "finance_manager_hy.controllers",
+    "finance_manager_hy.components",
+    "finance_manager_hy.diplomat",
+]
+ignore_imports = [
+    "finance_manager_hy.diplomat.* -> finance_manager_hy.entities.*",
+    "finance_manager_hy.diplomat.* -> finance_manager_hy.wire.*",
+]
+
+[tool.importlinter.contracts.no-entity-imports-in-adapters]
+name = "No entity imports in adapters"
+type = "forbidden"
+source = "finance_manager_hy.adapters"
+forbidden = ["finance_manager_hy.entities"]
+
+[tool.importlinter.contracts.no-logic-imports-in-wire]
+name = "No logic imports in wire formats"
+type = "forbidden"
+source = "finance_manager_hy.wire"
+forbidden = ["finance_manager_hy.logic"]
+
+[tool.importlinter.contracts.no-controller-imports-in-logic]
+name = "No controller imports in logic"
+type = "forbidden"
+source = "finance_manager_hy.logic"
+forbidden = ["finance_manager_hy.controllers"]
+
+[tool.importlinter.contracts.no-component-imports-in-core]
+name = "No component imports in core layers"
+type = "forbidden"
+source = "finance_manager_hy.entities,finance_manager_hy.logic,finance_manager_hy.wire"
+forbidden = ["finance_manager_hy.components"]
+
+[tool.importlinter.contracts.diplomat-independent]
+name = "Diplomat utilities independent"
+type = "independence"
+modules = [
+    "finance_manager_hy.diplomat.schema",
+    "finance_manager_hy.diplomat.wire",
+    "finance_manager_hy.diplomat.adapter",
+    "finance_manager_hy.diplomat.interceptors",
+]

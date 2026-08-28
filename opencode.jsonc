@@ -1,0 +1,61 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "anthropic/claude-sonnet-4-5",
+  "small_model": "anthropic/claude-haiku-4-5",
+  "provider": {
+    "anthropic": {
+      "options": {
+        "timeout": 600000,
+        "chunkTimeout": 30000,
+        "setCacheKey": true
+      }
+    }
+  },
+  "default_agent": "build",
+  "subagent_depth": 2,
+  "formatter": {
+    "hyfmt": {
+      "command": ["hyfmt", "--in-place", "$FILE"],
+      "extensions": [".hy"]
+    }
+  },
+  "lsp": {
+    "hy": {
+      "command": ["hy-lsp"],
+      "extensions": [".hy"]
+    }
+  },
+  "permission": {
+    "bash": "ask",
+    "write": "ask",
+    "edit": "ask"
+  },
+  "watcher": {
+    "ignore": [
+      "__pycache__/**",
+      "*.pyc",
+      ".pytest_cache/**",
+      ".mypy_cache/**",
+      ".ruff_cache/**",
+      "dist/**",
+      "build/**",
+      "*.egg-info/**",
+      ".coverage",
+      ".hypothesis/**",
+      "mutants/**",
+      "node_modules/**"
+    ]
+  },
+  "instructions": [
+    "AGENTS.md"
+  ],
+  "experimental": {
+    "policies": [
+      {
+        "effect": "deny",
+        "action": "provider.use",
+        "resource": "openai"
+      }
+    ]
+  }
+}
