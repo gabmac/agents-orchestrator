@@ -74,14 +74,12 @@ packages = ["src/finance_manager_hy"]
 [tool.ruff]
 target-version = "py312"
 line-length = 100
-indent-style = "space"
 indent-width = 2
 preview = true
 
 [tool.ruff.format]
 quote-style = "single"
 indent-style = "space"
-indent-width = 2
 
 [tool.ruff.lint]
 select = [

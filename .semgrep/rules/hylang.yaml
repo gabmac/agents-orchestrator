@@ -1,0 +1,54 @@
+rules:
+- id: hylang-macro-hygiene
+  languages: [lisp]
+  message: "Macro must use gensym/defmacro/g! for hygiene"
+  severity: WARNING
+  patterns:
+  - pattern: (defmacro $NAME $ARGS $BODY)
+  - pattern-not: (defmacro/g! $NAME $ARGS $BODY)
+  - pattern-not: (defmacro $NAME $ARGS ... (gensym ...) ...)
+  metadata:
+    category: macro-hygiene
+    references: ["https://docs.hylang.org/en/stable/language/macros.html#macro-hygiene"]
+
+- id: hylang-no-eval
+  languages: [lisp]
+  message: "Avoid eval/compile on untrusted input"
+  severity: ERROR
+  patterns:
+  - pattern: (eval $X)
+  - pattern: (compile $X)
+  metadata:
+    category: security
+    cwe: "CWE-94"
+
+- id: hylang-thread-macros
+  languages: [lisp]
+  message: "Prefer threading macros (->, ->>) over nested calls"
+  severity: INFO
+  patterns:
+  - pattern: ($F ($G ($H $X)))
+  - pattern-not: (-> $X $H $G $F)
+  - pattern-not: (->> $X $H $G $F)
+  metadata:
+    category: style
+
+- id: hylang-destructuring
+  languages: [lisp]
+  message: "Prefer destructuring with let over get/nth"
+  severity: INFO
+  patterns:
+  - pattern: (get $COLL $IDX)
+  - pattern-not: (let [[$A $B] $COLL] ...)
+  metadata:
+    category: style
+
+- id: hylang-python-interop
+  languages: [lisp]
+  message: "Use (import [module [name]]) over import statement"
+  severity: INFO
+  patterns:
+  - pattern: (import $MODULE)
+  - pattern-not: (import [$MODULE [$NAME]])
+  metadata:
+    category: interop

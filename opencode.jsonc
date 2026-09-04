@@ -47,7 +47,8 @@
     ]
   },
   "instructions": [
-    "AGENTS.md"
+    "AGENTS.md",
+    "docs/llm-rules/indirection.md"
   ],
   "experimental": {
     "policies": [
