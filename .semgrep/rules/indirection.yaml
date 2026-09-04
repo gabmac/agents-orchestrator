@@ -1,0 +1,52 @@
+rules:
+- id: no-trivial-indirection
+  languages: [lisp]
+  message: "Function is a trivial indirection - call the target function directly"
+  severity: WARNING
+  patterns:
+  - pattern: |
+      (defn $NAME [$ARG $REST...] ($CALL $ARG $REST...))
+  metadata:
+    category: code-quality
+    references: ["https://en.wikipedia.org/wiki/Indirection"]
+
+- id: no-single-call-wrapper
+  languages: [lisp]
+  message: "Function wraps a single call - consider inlining or removing the wrapper"
+  severity: INFO
+  patterns:
+  - pattern-either:
+    - pattern: |
+        (defn $NAME [$ARG] ($CALL $ARG))
+    - pattern: |
+        (defn $NAME [] ($CALL))
+    - pattern: |
+        (defn $NAME [$ARG $B] ($CALL $ARG $B))
+    - pattern: |
+        (defn $NAME [$ARG $B $C] ($CALL $ARG $B $C))
+  metadata:
+    category: code-quality
+    references: ["https://en.wikipedia.org/wiki/Indirection"]
+
+- id: no-pass-through
+  languages: [lisp]
+  message: "Function is a pass-through - consider removing the indirection"
+  severity: INFO
+  patterns:
+  - pattern: |
+      (defn $NAME [$ARG $REST...] (apply $CALL [$ARG $REST...]))
+  metadata:
+    category: code-quality
+    references: ["https://en.wikipedia.org/wiki/Indirection"]
+
+- id: no-passthrough-wrapper-py
+  languages: [python]
+  message: "Function is a trivial wrapper - call the target function directly"
+  severity: INFO
+  patterns:
+  - pattern: |
+      def $NAME($ARG, $REST):
+          return $CALL($ARG, $REST)
+  metadata:
+    category: code-quality
+    references: ["https://en.wikipedia.org/wiki/Indirection"]

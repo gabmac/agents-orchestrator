@@ -1,0 +1,25 @@
+rules:
+- id: no-uuid4
+  languages: [lisp]
+  message: "Avoid uuid4 - use uuid6 or uuid7 for better sortability and traceability"
+  severity: ERROR
+  patterns:
+  - pattern: (import uuid [uuid4])
+  - pattern: (import uuid [$X uuid4])
+  - pattern: (import uuid [uuid4 $X])
+  - pattern: (import uuid [$X uuid4 $Y])
+  metadata:
+    category: best-practices
+    references: ["https://github.com/oittaa/uuid6-python"]
+
+- id: no-uuid4-call
+  languages: [lisp]
+  message: "Avoid uuid4() - use uuid6() or uuid7() for better sortability and traceability"
+  severity: ERROR
+  patterns:
+  - pattern: (uuid4)
+  - pattern: (uuid4)
+  - pattern: (str (uuid4))
+  metadata:
+    category: best-practices
+    references: ["https://github.com/oittaa/uuid6-python"]
